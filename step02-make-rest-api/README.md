@@ -156,7 +156,9 @@ GET은 Body 가 없어서 URL을 직접 호출 할 수 있지만, POST는 요청
 
 [Postman 설치하기](https://www.postman.com/downloads/)
 
-![image-20200606231312774](C:\Users\msno2\AppData\Roaming\Typora\typora-user-images\image-20200606231312774.png)
+<div style="text-align: center">
+    <img src="./img/step02-3.png" width="100%">    
+</div>
 
 위와 같이 실행하면 결과값을 받아 볼 수 있습니다.
 
@@ -181,7 +183,9 @@ public ResponseEntity<Todo> postRegistryTodo(@RequestParam String todoTitle){
 }
 ```
 
-![image-20200607012629455](C:\Users\msno2\AppData\Roaming\Typora\typora-user-images\image-20200607012629455.png)
+<div style="text-align: center">
+    <img src="./img/step02-4.png" width="100%">    
+</div>
 
 결과를 받아보면 `Status: 201 Created` 라는 결과를 받아 볼 수 있습니다.
 
@@ -269,7 +273,9 @@ public ResponseEntity<TodoResource> resourceResponseEntity(@RequestParam String 
 
 결과는 다음과 같습니다.
 
-![image-20200607014156813](C:\Users\msno2\AppData\Roaming\Typora\typora-user-images\image-20200607014156813.png)
+<div style="text-align: center">
+    <img src="./img/step02-5.png" width="100%">    
+</div>
 
 
 
