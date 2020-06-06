@@ -68,7 +68,6 @@ public class Todo {
         this.title = title;
     }
 }
-
 ```
 
 
@@ -106,7 +105,6 @@ public class TodoController {
         return new Todo(counter.incrementAndGet(), "코딩하기");
     }
 }
-
 ```
 
 
@@ -132,4 +130,152 @@ localhost:8080/todo/todo 를 계속 호출해보면 호출 할 때마다 숫자�
 </div>
 
 
+
+
+
+## REST API에서 HTTP Method 사용
+
+### 컨트롤러 메서드에 POST 매핑
+
+TodoController.java 에 POST 메서드를 만듭니다.
+
+```java
+@PostMapping("/todo")
+public Todo registryTodo(@RequestParam(value="todoTitle") String todoTitle){
+    return new Todo(counter.incrementAndGet(), todoTitle);
+}
+```
+
+
+
+`/todo/todo`를 엔드 포인트로 합니다.
+
+GET은 Body 가 없어서 URL을 직접 호출 할 수 있지만, POST는 요청의 몸체가 되므로 도구를 사용해서 테스트 해봐야합니다.
+
+여기서는 `Postman`를 사용하도록 하겠습니다.
+
+[Postman 설치하기](https://www.postman.com/downloads/)
+
+![image-20200606231312774](C:\Users\msno2\AppData\Roaming\Typora\typora-user-images\image-20200606231312774.png)
+
+위와 같이 실행하면 결과값을 받아 볼 수 있습니다.
+
+
+
 <br><br>
+
+
+
+### 응답 헤더 활용하기
+
+ResponseEntity 클래스는 HttpEntity를 상속받은 클래스로 Http 응답에 대한 상태값을 표현 할 수 있습니다.
+
+TodoController.java 에 다음 코드를 추가합니다.
+
+
+
+```java
+@PostMapping("/todo/response")
+public ResponseEntity<Todo> postRegistryTodo(@RequestParam String todoTitle){
+    return new ResponseEntity<>(new Todo(counter.incrementAndGet(), todoTitle), HttpStatus.CREATED);
+}
+```
+
+![image-20200607012629455](C:\Users\msno2\AppData\Roaming\Typora\typora-user-images\image-20200607012629455.png)
+
+결과를 받아보면 `Status: 201 Created` 라는 결과를 받아 볼 수 있습니다.
+
+
+
+<br><br>
+
+
+
+
+
+
+
+## HATEOAS를 사용한 URI 정보 표현하기
+
+### HATEOAS 설정
+
+build.gradle 파일에 다음 라이브러리를 추가합니다.
+
+```yaml
+dependencies {
+	compile 'org.springframework.boot:spring-boot-starter-hateoas'
+}
+```
+
+<br>
+
+<br>
+
+
+
+`ResourceSupport` 클래스를 상속받을 모델 클래스 `TodoResource.java`를 만들도록 하겠습니다.
+
+```java
+package seok.model;
+
+import org.springframework.hateoas.ResourceSupport;
+
+public class TodoResource extends ResourceSupport {
+    private String title;
+
+    public TodoResource() {
+
+    }
+
+    public TodoResource(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+}
+```
+
+
+
+<br><br>
+
+
+
+`Controller`에 다음을 추가하도록 하겠습니다.
+
+```java
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+...
+
+@PostMapping("/todo/hateoas")
+public ResponseEntity<TodoResource> resourceResponseEntity(@RequestParam String todoTitle){
+    TodoResource todoResource = new TodoResource(todoTitle);
+    todoResource.add(linkTo(methodOn(TodoController.class).resourceResponseEntity(todoTitle)).withSelfRel());
+    return new ResponseEntity<>(todoResource, HttpStatus.OK);
+}
+```
+
+> todoResource 인스턴스를 생성한 후에 링크 정보 추가를 위해서 linkTo 메서드로 TodoController 클래스의 resourceResponseEntity 메서드를 매핑후, withSelfRel 메서드를 이용해 URL 정보를 만들고 add메서드로 정보를 추가했습니다.
+
+
+
+결과는 다음과 같습니다.
+
+![image-20200607014156813](C:\Users\msno2\AppData\Roaming\Typora\typora-user-images\image-20200607014156813.png)
+
+
+
+
+
+
+
+## REST API 문서화
+
