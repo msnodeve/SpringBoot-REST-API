@@ -19,4 +19,4 @@ JAVA
 
 
 ## 단계별 Branch
-- [step01](https://github.com/msnodeve/SpringBoot-REST-API/step01-make-project) Spring Boot 프로젝트 생성 및 실행하기
+- [step01](https://github.com/msnodeve/SpringBoot-REST-API/tree/master/step01-make-project) Spring Boot 프로젝트 생성 및 실행하기
