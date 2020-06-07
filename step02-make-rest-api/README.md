@@ -285,3 +285,130 @@ public ResponseEntity<TodoResource> resourceResponseEntity(@RequestParam String 
 
 ## REST API 문서화
 
+> API를 제공하려면 가이드 문서 제공이 필수적인데, 개발할 때 마다 별도의 문서를 작성하고 업데이트하는 것은 비용이 많이 듭니다. 따라서 `Swagger` 를 이용해서 API를 설명하는 페이지를 자동 생성하는 방법을 알아 보도록 하겠습니다.
+
+
+
+### Swagger 라이브러리 추가
+
+build.gradle에 `springfox-swagger2`, `springfox-swagger-ui`을 추가합니다.
+
+> `dependencies`의 라이브러리들을 최신, 가장많이 사용하는 라이브러리들로 좀 교체했습니다.
+> build.gradle의 전체 내용은 다음과 같습니다.
+
+```yaml
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.2.2.RELEASE'
+}
+
+ext{
+    springBootVersion='2.2.2.RELEASE'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+
+sourceSets{
+    main{
+        java {
+            srcDir 'src/main/java'
+        }
+        resources{
+            srcDir 'src/resources'
+        }
+    }
+}
+
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.2.2.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.0.4.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '2.1.5.RELEASE'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+
+    compile 'org.slf4j:slf4j-api:1.7.7'
+
+    testCompile 'junit:junit:4.12'
+
+    //capcha
+    compile group: 'com.google.code.maven-play-plugin.org.playframework', name: 'jj-imaging', version: '1.1'
+    compile group: 'com.google.code.maven-play-plugin.org.playframework', name: 'jj-simplecaptcha', version: '1.1'
+}
+```
+
+
+
+### SwaggerConfiguration 클래스 만들기
+
+> src/main/java/seok/configuration 패키지 생성 후 SwaggerConfiguration.java 클래스를 생성합니다.
+
+```java
+package seok.configuration;
+
+import com.google.common.base.Predicate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import static com.google.common.base.Predicates.or;
+import static springfox.documentation.builders.PathSelectors.regex;
+
+@Configuration
+@EnableSwagger2
+public class SwaggerConfiguration {
+    @Bean
+    public Docket postsApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("public-api")
+                .apiInfo(apiInfo()).select().paths(postPaths()).build();
+    }
+
+    private Predicate<String> postPaths() {
+        return or(regex("/todo/.*"));
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder().title("TODO API")
+                .description("Todo REST API 개발 문서")
+                .license("msnodeve License")
+                .licenseUrl("msnodeve@gmail.com").version("1.0").build();
+    }
+}
+```
+
+<br>
+
+```java
+private Predicate<String> postPaths() {
+    return or(regex("/todo/.*"));
+}
+```
+
+해당 부분은 컨트롤러의 기본 URI 가 todo로 시작하기 때문에 /todo만 인식하도록 설정을 추가한 것 입니다.
+
+
+
+<br><br>
+
+
+
+### 실행해보기
+
+http://localhost:8080/swagger-ui.html#/ 로 접속을 해보면 지금까지 작성해온 API가 UI로 표시되는 모습을 확인 할 수 있습니다.
+
+<div style="text-align: center">
+    <img src="./img/step02-6.png" width="100%">    
+</div>
+
+각  메서드의 별도 동작은 한번씩 작동 시켜보길 바랍니다.
+
