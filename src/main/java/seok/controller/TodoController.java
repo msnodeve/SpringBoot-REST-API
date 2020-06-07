@@ -6,10 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import seok.model.Todo;
 import seok.model.TodoResource;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 @RestController
 @RequestMapping(value = "/todo")
